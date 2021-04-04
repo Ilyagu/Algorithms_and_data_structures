@@ -1,3 +1,0 @@
-/home/ilyagu/Algorithms_and_data_structures/Task4/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/home/ilyagu/Algorithms_and_data_structures/Task4/cmake-build-debug/CMakeFiles/edit_cache.dir
-/home/ilyagu/Algorithms_and_data_structures/Task4/cmake-build-debug/CMakeFiles/Task4.dir

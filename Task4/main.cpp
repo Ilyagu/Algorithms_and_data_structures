@@ -18,7 +18,7 @@ struct DefaultComparator {
 
 template <class T, class Comparator = DefaultComparator<T>>
 class Heap {
- public:
+public:
     Heap() : size(0), capacity(0), arr(nullptr), comp(Comparator()) {}
     explicit Heap(Comparator _comp)
             : size(0), capacity(0), arr(nullptr), comp(_comp) {}
@@ -32,7 +32,7 @@ class Heap {
 
     void insert(T element) {
         if (size == capacity) {
-            resize();
+            resize((capacity == 0) ? 1 : 2 * capacity);
         }
 
         arr[size] = element;
@@ -54,7 +54,8 @@ class Heap {
         return result;
     }
     T peek_min() const {
-        if (size!=0) return arr[0];
+        assert(size !=0);
+        return arr[0];
     }
     ssize_t get_size() {
         return size;
@@ -65,7 +66,7 @@ class Heap {
         cout <<endl;
     }
 
- private:
+private:
     void sift_down(int i) {
         int left = 2 * i + 1;
         int right = 2 * i + 2;
@@ -73,7 +74,7 @@ class Heap {
         int least = i;
         if (left < size && comp(arr[left], arr[i]))
             least = left;
-        if (right < size && comp(arr[right], arr[i]))
+        if (right < size && comp(arr[right], arr[least]))
             least = right;
 
         if (least != i) {
@@ -91,9 +92,8 @@ class Heap {
             i = parent;
         }
     }
-    void resize() {
-        if (capacity == 0) capacity = 1;
-        else capacity = capacity * 2;
+    void resize(ssize_t _capacity) {
+        capacity = _capacity;
         T *new_arr = new T[capacity];
 
         for (int i = 0; i < size; ++i) {
@@ -118,28 +118,35 @@ struct PairComparator {
     }
 };
 
-int main() {
-    int n;
-    cin >> n;
+Train_Time<int> * input_comands(Train_Time<int> * comands_arr, int * n) {
+    cin >> *n;
+    comands_arr = new Train_Time<int>[*n];
+    for (int i = 0; i < *n; ++i) {
+        cin >> comands_arr[i].arrival >> comands_arr[i].departure;
+    }
+    return comands_arr;
+}
 
+ssize_t dead_ends(Train_Time<int> * comands_arr, int * n) {
     PairComparator<int> comp;
     Heap<Train_Time<int>, PairComparator<int>> arr(comp);
-
     ssize_t m = 0;
-    Train_Time<int> train;
-    for (int i = 0; i < n; ++i) {
-        cin >> train.arrival >> train.departure;
+    for(int i = 0; i < *n; i++) {
 
-        while (arr.get_size() != 0 && train.arrival > arr.peek_min().departure) {
+        while (arr.get_size() != 0 && comands_arr[i].arrival > arr.peek_min().departure) {
             arr.extract_min();
         };
 
-        arr.insert(train);
+        arr.insert(comands_arr[i]);
 
         m = (m > arr.get_size()) ? m : arr.get_size();
-
-        if (m <= arr.get_size()) m = arr.get_size();
     }
+    return m;
+}
 
-    cout << m << endl;
+int main() {
+    int n = 0;
+    Train_Time<int> * comands_arr = input_comands(comands_arr, &n);
+    cout << dead_ends(comands_arr, &n) << endl;
+    delete[] comands_arr;
 }
