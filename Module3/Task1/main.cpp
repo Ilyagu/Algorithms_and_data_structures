@@ -26,13 +26,13 @@ void dfs_aux(const IGraph& graph, int vertex, std::vector<bool>& visited,
 	}
 }
 
-void dfs(const IGraph& graph, std::function<void(int)> callback) {
+void dfs(const IGraph& graph, std::function<void(int)> print) {
 	std::vector<bool> visited;
 	visited.resize(graph.VerticesCount(), false);
 
 	for (int i = 0; i < graph.VerticesCount(); ++i) {
 		if (!visited[i]) {
-			dfs_aux(graph, i, visited, callback);
+			dfs_aux(graph, i, visited, print);
 		}
 	}
 }
@@ -72,31 +72,31 @@ int main() {
 	graph.AddEdge(4, 2);
 
 
-	auto callback = [](int v) {
+	auto print = [](int v) {
 		std::cout << v << " ";
 	};
 
 	std::cout << "------------------------" << std::endl;
 	std::cout << "List Graph size = " <<  graph.VerticesCount() << std::endl;
-	dfs(graph, callback);
+	dfs(graph, print);
 
 	std::cout << std::endl << "------------------------" << std::endl;
 	MatrixGraph matrix_graph(graph);
 	std::cout << "Matrix graph  size = " <<  matrix_graph.VerticesCount() << std::endl;
 
-	dfs(matrix_graph, callback);
+	dfs(matrix_graph, print);
 
 	std::cout << std::endl << "------------------------" << std::endl;
 	SetGraph set_graph(matrix_graph);
 	std::cout << "Set graph  size = " <<  set_graph.VerticesCount() << std::endl;
 
-	dfs(set_graph, callback);
+	dfs(set_graph, print);
 
 	std::cout << std::endl << "------------------------" << std::endl;
 	ArcGraph arc_graph(set_graph);
 	std::cout << "Arc graph  size = " <<  arc_graph.VerticesCount() << std::endl;
 
-	dfs(arc_graph, callback);
+	dfs(arc_graph, print);
 
     std::cout << "\n";
 

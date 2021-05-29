@@ -25,7 +25,7 @@ public:
 	[[nodiscard]] std::vector<int> GetPrevVertices(int vertex) const override;
 
 private:
-	std::vector<std::vector<int> > _graph;
+	std::vector<std::vector<int>> _graph;
 };
 
 #endif //TASK1_LISTGRAPH_HPP
