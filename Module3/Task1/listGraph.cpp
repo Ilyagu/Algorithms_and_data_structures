@@ -4,9 +4,9 @@
 
 ListGraph::ListGraph(size_t verticesCount) : _graph(verticesCount) {}
 
-ListGraph::ListGraph(const IGraph &graph) {
-  for (int i = 0; i != graph.VerticesCount(); ++i) {
-    _graph[i] = graph.GetNextVertices(i);
+ListGraph::ListGraph(const IGraph &imageGraph) {
+  for (int i = 0; i != imageGraph.VerticesCount(); ++i) {
+    _graph[i] = imageGraph.GetNextVertices(i);
   }
 }
 
@@ -15,7 +15,10 @@ void ListGraph::AddEdge(int from, int to) { _graph[from].push_back(to); }
 size_t ListGraph::VerticesCount() const { return _graph.size(); }
 
 std::vector<int> ListGraph::GetNextVertices(int vertex) const {
-  return _graph[vertex];
+  std::vector<int> result;
+  result.resize(_graph[vertex].size());
+  std::copy(_graph[vertex].begin(), _graph[vertex].end(), result.begin());
+  return result;
 }
 
 std::vector<int> ListGraph::GetPrevVertices(int vertex) const {

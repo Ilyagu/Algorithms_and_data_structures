@@ -4,10 +4,10 @@
 
 SetGraph::SetGraph(size_t verticesCount) : _graph(verticesCount) {}
 
-SetGraph::SetGraph(const IGraph &graph) {
-  _graph.resize(graph.VerticesCount());
-  for (int i = 0; i != graph.VerticesCount(); ++i) {
-    std::vector<int> vertices = graph.GetNextVertices(i);
+SetGraph::SetGraph(const IGraph &imageGraph) {
+  _graph.resize(imageGraph.VerticesCount());
+  for (int i = 0; i != imageGraph.VerticesCount(); ++i) {
+    std::vector<int> vertices = imageGraph.GetNextVertices(i);
     _graph[i].insert(vertices.begin(), vertices.end());
   }
 }

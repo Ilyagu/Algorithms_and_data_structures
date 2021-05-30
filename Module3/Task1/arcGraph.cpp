@@ -4,9 +4,9 @@
 
 ArcGraph::ArcGraph(size_t verticesCount) : _graph(verticesCount) {}
 
-ArcGraph::ArcGraph(const IGraph &graph) {
-  for (int i = 0; i != graph.VerticesCount(); ++i) {
-    std::vector<int> vertices = graph.GetNextVertices(i);
+ArcGraph::ArcGraph(const IGraph &imageGraph) {
+  for (int i = 0; i != imageGraph.VerticesCount(); ++i) {
+    std::vector<int> vertices = imageGraph.GetNextVertices(i);
     for (int elem : vertices) {
       _graph.emplace_back(std::make_pair(i, elem));
     }

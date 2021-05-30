@@ -5,11 +5,11 @@
 MatrixGraph::MatrixGraph(size_t verticesCount)
     : _graph(verticesCount, std::vector<int>(verticesCount, 0)) {}
 
-MatrixGraph::MatrixGraph(const IGraph &graph)
-    : _graph(graph.VerticesCount(),
-             std::vector<int>(graph.VerticesCount(), 0)) {
-  for (int i = 0; i != graph.VerticesCount(); ++i) {
-    std::vector<int> verticals = graph.GetNextVertices(i);
+MatrixGraph::MatrixGraph(const IGraph &imageGraph)
+    : _graph(imageGraph.VerticesCount(),
+             std::vector<int>(imageGraph.VerticesCount(), 0)) {
+  for (int i = 0; i != imageGraph.VerticesCount(); ++i) {
+    std::vector<int> verticals = imageGraph.GetNextVertices(i);
     for (int elem : verticals) {
       _graph[i][elem] = 1;
     }

@@ -2,10 +2,9 @@
 
 #include <cassert>
 #include <iostream>
+#include <limits>
 #include <set>
 #include <vector>
-
-#define MAX_INT32 2147483647
 
 struct IWeightGraph {
   virtual ~IWeightGraph() = default;
@@ -15,10 +14,10 @@ struct IWeightGraph {
 
   [[nodiscard]] virtual int VerticesCount() const = 0;
 
-  [[nodiscard]] virtual std::vector<std::pair<int, int>> GetNextVertices(
-      int vertex) const = 0;
-  [[nodiscard]] virtual std::vector<std::pair<int, int>> GetPrevVertices(
-      int vertex) const = 0;
+  [[nodiscard]] virtual std::vector<std::pair<int, int>>
+    GetChildren(int vertex) const = 0;
+  [[nodiscard]] virtual std::vector<std::pair<int, int>>
+    GetParents(int vertex) const = 0;
 };
 
 class WeightListGraph : public IWeightGraph {
@@ -29,10 +28,10 @@ class WeightListGraph : public IWeightGraph {
   void AddEdge(int from, int to, int weight) override;
 
   [[nodiscard]] int VerticesCount() const override;
-  [[nodiscard]] std::vector<std::pair<int, int>> GetNextVertices(
-      int vertex) const override;  // vertex, weight
-  [[nodiscard]] std::vector<std::pair<int, int>> GetPrevVertices(
-      int vertex) const override;  // vertex, weight
+  [[nodiscard]] std::vector<std::pair<int, int>>
+    GetChildren(int vertex) const override;  // vertex, weight
+  [[nodiscard]] std::vector<std::pair<int, int>>
+    GetParents(int vertex) const override;  // vertex, weight
 
  private:
   std::vector<std::vector<std::pair<int, int>>>
@@ -45,7 +44,7 @@ WeightListGraph::WeightListGraph(int vertexCount)
 WeightListGraph::WeightListGraph(const IWeightGraph& graph) {
   adjacencyLists.resize(graph.VerticesCount());
   for (int from = 0; from < adjacencyLists.size(); ++from)
-    adjacencyLists[from] = graph.GetNextVertices(from);
+    adjacencyLists[from] = graph.GetChildren(from);
 }
 
 void WeightListGraph::AddEdge(int from, int to, int weight) {
@@ -54,20 +53,21 @@ void WeightListGraph::AddEdge(int from, int to, int weight) {
   assert(weight >= 0);
 
   adjacencyLists[from].push_back(std::make_pair(to, weight));
-  adjacencyLists[to].push_back(std::make_pair(
-      from, weight));  // добавлено чтобы граф был неориентированным
+  adjacencyLists[to].push_back(std::make_pair(from, weight));
+  // добавлено чтобы граф был неориентированным
 }
 
-int WeightListGraph::VerticesCount() const { return adjacencyLists.size(); }
+int WeightListGraph::VerticesCount() const {
+  return adjacencyLists.size();
+}
 
-std::vector<std::pair<int, int>> WeightListGraph::GetNextVertices(
+std::vector<std::pair<int, int>> WeightListGraph::GetChildren(
     int vertex) const {
   assert(vertex >= 0 && vertex < adjacencyLists.size());
   return adjacencyLists[vertex];
 }
 
-std::vector<std::pair<int, int>> WeightListGraph::GetPrevVertices(
-    int vertex) const {
+std::vector<std::pair<int, int>> WeightListGraph::GetParents(int vertex) const {
   assert(vertex >= 0 && vertex < adjacencyLists.size());
   std::vector<std::pair<int, int>> result;
   for (int from = 0; from < adjacencyLists.size(); ++from)
@@ -77,86 +77,86 @@ std::vector<std::pair<int, int>> WeightListGraph::GetPrevVertices(
   return result;
 }
 
-int Relax(std::vector<int>& pathMinWeights, int fromToEdgeWeight, int from,
+int Relax(std::vector<int>& wayMinWeights, int EdgeWeight, int from,
           int to, std::vector<int>& parents) {
-  if (pathMinWeights[to] > pathMinWeights[from] + fromToEdgeWeight) {
-    int oldWeight = pathMinWeights[to];
-    pathMinWeights[to] = pathMinWeights[from] + fromToEdgeWeight;
+  if (wayMinWeights[to] > wayMinWeights[from] + EdgeWeight) {
+    int oldWeight = wayMinWeights[to];
+    wayMinWeights[to] = wayMinWeights[from] + EdgeWeight;
     parents[to] = from;
     return oldWeight;
   }
   return -1;
 }
 
-int minPath(const IWeightGraph& graph, int from, int to) {
+int minWay(const IWeightGraph& graph, int from, int to) {
   std::vector<int> parents(graph.VerticesCount(), -1);
-  std::vector<int> pathMinWeights(graph.VerticesCount(), MAX_INT32);
+  std::vector<int> wayMinWeights(graph.VerticesCount(),
+                                  std::numeric_limits<int>::max());
 
-  auto cmp = [](std::pair<int, int> p1, std::pair<int, int> p2) {
-    if (p1.second < p2.second)
+  auto comp = [](std::pair<int, int> w1, std::pair<int, int> w2) {
+    if (w1.second < w2.second)
       return true;
-    else if (p1.second > p2.second)
+    else if (w1.second > w2.second)
       return false;
     else
-      return p1.first < p2.first;
+      return w1.first < w2.first;
   };
-  std::set<std::pair<int, int>, decltype(cmp)> priorityQueue(cmp);
 
-  pathMinWeights[from] = 0;
-  priorityQueue.insert(std::make_pair(from, pathMinWeights[from]));
+  std::set<std::pair<int, int>, decltype(comp)> priorityQueue(comp);
+
+  wayMinWeights[from] = 0;
+  priorityQueue.insert(std::make_pair(from, wayMinWeights[from]));
 
   while (!priorityQueue.empty()) {
     auto cur = priorityQueue.begin();
     std::pair<int, int> current = *cur;
     priorityQueue.erase(cur);
-    auto nextVertices = graph.GetNextVertices(current.first);
-    for (int i = 0; i < nextVertices.size(); i++) {
+    auto children = graph.GetChildren(current.first);
+    for (int i = 0; i < children.size(); i++) {
       // встречаем вершину первый раз - задаем текущий путь
-      if (pathMinWeights[nextVertices[i].first] == MAX_INT32) {
-        pathMinWeights[nextVertices[i].first] =
-            pathMinWeights[current.first] + nextVertices[i].second;
-        parents[nextVertices[i].first] = current.first;
+      if (wayMinWeights[children[i].first] ==
+          std::numeric_limits<int>::max()) {
+        wayMinWeights[children[i].first] =
+            wayMinWeights[current.first] + children[i].second;
+        parents[children[i].first] = current.first;
         priorityQueue.insert(std::make_pair(
-            nextVertices[i].first, pathMinWeights[nextVertices[i].first]));
+            children[i].first, wayMinWeights[children[i].first]));
         // уже встречали вершину - пробуем оптимизировать путь с помощью Relax
       } else {
-        int oldWeight = Relax(pathMinWeights, nextVertices[i].second,
-                              current.first, nextVertices[i].first, parents);
+        int oldWeight = Relax(wayMinWeights, children[i].second,
+                              current.first, children[i].first, parents);
         if (oldWeight != -1) {
           // заменяем элемент в очереди уже с актуальным весом пути
           auto element = priorityQueue.find(
-              std::make_pair(nextVertices[i].first, oldWeight));
+              std::make_pair(children[i].first, oldWeight));
           if (element != priorityQueue.end()) priorityQueue.erase(element);
           priorityQueue.insert(
-              std::make_pair(nextVertices[i].first, pathMinWeights[i]));
+              std::make_pair(children[i].first, wayMinWeights[i]));
         }
       }
     }
   }
 
-  return pathMinWeights[to];
+  return wayMinWeights[to];
 }
 
 int main() {
-  int n = 0;
-  std::cin >> n;
+  int vertices = 0;
+  std::cin >> vertices;
 
-  WeightListGraph graph(n);
+  WeightListGraph weightListGraph(vertices);
 
-  int m = 0;
-  std::cin >> m;
-  for (int i = 0; i < m; i++) {
-    int from;
-    int to;
-    int weight;
+  int edges = 0, from = 0, to = 0;
+  std::cin >> edges;
+
+  for (int i = 0; i < edges; i++) {
+    int weight = 0;
     std::cin >> from >> to >> weight;
-    graph.AddEdge(from, to, weight);
+    weightListGraph.AddEdge(from, to, weight);
   }
 
-  int from = 0;
-  int to = 0;
   std::cin >> from >> to;
 
-  std::cout << minPath(graph, from, to);
+  std::cout << minWay(weightListGraph, from, to) << std::endl;
   return 0;
 }

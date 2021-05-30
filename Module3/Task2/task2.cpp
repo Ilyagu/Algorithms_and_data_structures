@@ -1,126 +1,124 @@
 // Copyright 2021 Ilyagu Nagdimaev
 
-#include <vector>
+#include <iostream>
 #include <limits>
 #include <queue>
-#include <iostream>
+#include <vector>
 
 struct IGraph {
-    virtual ~IGraph() = default;
+  virtual ~IGraph() = default;
 
-    // Добавление ребра от from к to.
-    virtual void AddEdge(int from, int to) = 0;
+  // Добавление ребра от from к to.
+  virtual void AddEdge(int from, int to) = 0;
 
-    [[nodiscard]] virtual int VerticesCount() const  = 0;
+  [[nodiscard]] virtual int VerticesCount() const = 0;
 
-    [[nodiscard]] virtual std::vector<int> GetNextVertices(int vertex) const = 0;
-    [[nodiscard]] virtual std::vector<int> GetPrevVertices(int vertex) const = 0;
+  [[nodiscard]] virtual std::vector<int> GetChildren(int vertex) const = 0;
+  [[nodiscard]] virtual std::vector<int> GetParents(int vertex) const = 0;
 };
 
 class ListGraph : public IGraph {
  public:
-    explicit ListGraph(size_t verticesCount);
+  explicit ListGraph(size_t verticesCount);
 
-    explicit ListGraph(const IGraph& graph);
+  explicit ListGraph(const IGraph& graph);
 
-    ~ListGraph() override = default;
+  ~ListGraph() override = default;
 
-    // Добавление ребра от from к to.
-    void AddEdge(int from, int to) override;
+  // Добавление ребра от from к to.
+  void AddEdge(int from, int to) override;
 
-    [[nodiscard]] int VerticesCount() const override;
+  [[nodiscard]] int VerticesCount() const override;
 
-    [[nodiscard]] std::vector<int> GetNextVertices(int vertex) const override;
+  [[nodiscard]] std::vector<int> GetChildren(int vertex) const override;
 
-    [[nodiscard]] std::vector<int> GetPrevVertices(int vertex) const override;
+  [[nodiscard]] std::vector<int> GetParents(int vertex) const override;
 
-    [[nodiscard]] int short_paths(int from, int to) const;
+  [[nodiscard]] int minWay(int from, int to) const;
 
  private:
-    std::vector<std::vector<int>> graph_;
+  std::vector<std::vector<int>> _graph;
 };
 
-ListGraph::ListGraph(size_t verticesCount) : graph_(verticesCount) {}
+ListGraph::ListGraph(size_t verticesCount) : _graph(verticesCount) {}
 
 ListGraph::ListGraph(const IGraph& graph) {
-    for (int i = 0; i != graph.VerticesCount(); ++i) {
-        graph_[i] = graph.GetNextVertices(i);
-    }
+  for (int i = 0; i != graph.VerticesCount(); ++i) {
+    _graph[i] = graph.GetChildren(i);
+  }
 }
 
 void ListGraph::AddEdge(int from, int to) {
-    graph_[from].push_back(to);
+  _graph[from].push_back(to);
 
-    graph_[to].push_back(from);
+  _graph[to].push_back(from);
 }
 
-int ListGraph::VerticesCount() const {
-    return graph_.size();
+int ListGraph::VerticesCount() const { return _graph.size(); }
+
+std::vector<int> ListGraph::GetChildren(int vertex) const {
+  std::vector<int> result;
+  result.resize(_graph[vertex].size());
+  std::copy(_graph[vertex].begin(), _graph[vertex].end(), result.begin());
+  return result;
 }
 
-std::vector<int> ListGraph::GetNextVertices(int vertex) const {
-    return graph_[vertex];
-}
-
-std::vector<int> ListGraph::GetPrevVertices(int vertex) const {
-    std::vector<int> result;
-    for (int i = 0; i < graph_.size(); ++i) {
-        for (auto child : graph_[i]) {
-            if (child == vertex) {
-                result.push_back(i);
-                break;
-            }
-        }
+std::vector<int> ListGraph::GetParents(int vertex) const {
+  std::vector<int> result;
+  for (int i = 0; i < _graph.size(); ++i) {
+    for (auto child : _graph[i]) {
+      if (child == vertex) {
+        result.push_back(i);
+        break;
+      }
     }
-    return result;
+  }
+  return result;
 }
 
-int ListGraph::short_paths(int from, int to) const {
-    std::vector<int> r(VerticesCount(),
-                       std::numeric_limits<int>::max());
-    std::vector<int> counter(VerticesCount(), 0);
-    std::queue<int> q;
-    q.push(from);
+int ListGraph::minWay(int from, int to) const {
+  std::vector<int> lol(VerticesCount(), std::numeric_limits<int>::max());
+  std::vector<int> minWaysCounter(VerticesCount(), 0);
+  std::queue<int> queue;
+  queue.push(from);
 
-    r[from] = 0;
-    counter[from] = 1;
+  lol[from] = 0;
+  minWaysCounter[from] = 1;
 
-    while (!q.empty()) {
-        int v = q.front();
-        q.pop();
+  while (!queue.empty()) {
+    int vertex = queue.front();
+    queue.pop();
 
-        for (auto w : GetNextVertices(v)) {
-            if (r[w] > r[v] + 1) {
-                r[w] = r[v] + 1;
-                q.push(w);
-                counter[w] = counter[v];
-            } else if (r[w] == r[v] + 1) {
-                counter[w] += counter[v];
-            }
-        }
+    for (auto child : GetChildren(vertex)) {
+      if (lol[child] > lol[vertex] + 1) {
+        lol[child] = lol[vertex] + 1;
+        queue.push(child);
+        minWaysCounter[child] = minWaysCounter[vertex];
+      } else if (lol[child] == lol[vertex] + 1) {
+        minWaysCounter[child] += minWaysCounter[vertex];
+      }
     }
-    return counter[to];
+  }
+  return minWaysCounter[to];
 }
-
 
 int main() {
-    int vertices;
-    std::cin >> vertices;
-    ListGraph graph(vertices);
-    int n;
+  int vertices = 0;
+  std::cin >> vertices;
 
-    std::cin >> n;
+  ListGraph listGraph(vertices);
 
-    int ver1, ver2;
-    for (size_t i = 0; i != n; ++i) {
-        std::cin >> ver1 >> ver2;
-        graph.AddEdge(ver1, ver2);
-    }
+  int edges = 0;
+  std::cin >> edges;
 
-    int from, to;
+  int from = 0, to = 0;
+  for (size_t i = 0; i != edges; ++i) {
     std::cin >> from >> to;
-    std::cout << graph.short_paths(from, to);
+    listGraph.AddEdge(from, to);
+  }
 
+  std::cin >> from >> to;
+  std::cout << listGraph.minWay(from, to) << std::endl;
 
-    return 0;
+  return 0;
 }

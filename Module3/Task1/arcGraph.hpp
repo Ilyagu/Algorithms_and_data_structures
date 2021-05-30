@@ -1,7 +1,7 @@
 // Copyright 2021 Ilyagu Nagdimaev
 
-#ifndef TASK1_ARCGRAPH_HPP
-#define TASK1_ARCGRAPH_HPP
+#ifndef MODULE3_TASK1_ARCGRAPH_HPP_
+#define MODULE3_TASK1_ARCGRAPH_HPP_
 
 #include <utility>
 #include <vector>
@@ -9,24 +9,21 @@
 #include "iGraph.hpp"
 
 class ArcGraph : public IGraph {
-public:
+ public:
+  explicit ArcGraph(size_t verticesCount);
 
-	explicit ArcGraph(size_t verticesCount);
+  explicit ArcGraph(const IGraph& imageGraph);
 
-	explicit ArcGraph(const IGraph& graph);
+  void AddEdge(int from, int to) override;
 
-	void AddEdge(int from, int to) override;
+  [[nodiscard]] size_t VerticesCount() const override;
 
+  [[nodiscard]] std::vector<int> GetNextVertices(int vertex) const override;
 
-	[[nodiscard]] size_t VerticesCount() const override;
+  [[nodiscard]] std::vector<int> GetPrevVertices(int vertex) const override;
 
-	[[nodiscard]] std::vector<int> GetNextVertices(int vertex) const  override;
-
-	[[nodiscard]] std::vector<int> GetPrevVertices(int vertex) const override;
-
-
-private:
-	std::vector<std::pair<int, int>> _graph;
+ private:
+  std::vector<std::pair<int, int>> _graph;
 };
 
-#endif //TASK1_ARCGRAPH_HPP
+#endif  // MODULE3_TASK1_ARCGRAPH_HPP_

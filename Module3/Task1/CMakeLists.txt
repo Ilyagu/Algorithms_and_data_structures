@@ -15,4 +15,4 @@ add_executable(Task1
         matrixGraph.hpp
         setGraph.cpp
         setGraph.hpp
-        main.cpp)
+        task1.cpp)
