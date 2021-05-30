@@ -21,9 +21,9 @@ class ListGraph : public IGraph {
 
   [[nodiscard]] size_t VerticesCount() const override;
 
-  [[nodiscard]] std::vector<int> GetNextVertices(int vertex) const override;
+  [[nodiscard]] std::vector<int> GetChildren(int vertex) const override;
 
-  [[nodiscard]] std::vector<int> GetPrevVertices(int vertex) const override;
+  [[nodiscard]] std::vector<int> GetParents(int vertex) const override;
 
  private:
   std::vector<std::vector<int>> _graph;

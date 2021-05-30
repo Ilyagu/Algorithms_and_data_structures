@@ -16,7 +16,7 @@ void dfs_aux(const IGraph& graph, int vertex, std::vector<bool>& visited,
   visited[vertex] = true;
   callback(vertex);
 
-  for (auto child : graph.GetNextVertices(vertex)) {
+  for (auto child : graph.GetChildren(vertex)) {
     if (!visited[child]) {
       dfs_aux(graph, child, visited, callback);
     }
@@ -46,7 +46,7 @@ void bfs(const IGraph& graph, void (*callback)(int v)) {
         int vertex = queue.front();
         queue.pop();
         callback(vertex);
-        for (auto child : graph.GetNextVertices(vertex)) {
+        for (auto child : graph.GetChildren(vertex)) {
           if (!visited[child]) {
             queue.push(child);
             visited[child] = true;

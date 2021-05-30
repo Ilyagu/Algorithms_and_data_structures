@@ -6,9 +6,9 @@ ArcGraph::ArcGraph(size_t verticesCount) : _graph(verticesCount) {}
 
 ArcGraph::ArcGraph(const IGraph &imageGraph) {
   for (int i = 0; i != imageGraph.VerticesCount(); ++i) {
-    std::vector<int> vertices = imageGraph.GetNextVertices(i);
-    for (int elem : vertices) {
-      _graph.emplace_back(std::make_pair(i, elem));
+    std::vector<int> children = imageGraph.GetChildren(i);
+    for (int child : children) {
+      _graph.emplace_back(std::make_pair(i, child));
     }
   }
 }
@@ -19,7 +19,7 @@ void ArcGraph::AddEdge(int from, int to) {
 
 size_t ArcGraph::VerticesCount() const { return _graph.size(); }
 
-std::vector<int> ArcGraph::GetNextVertices(int vertex) const {
+std::vector<int> ArcGraph::GetChildren(int vertex) const {
   std::vector<int> result;
 
   for (auto &edge : _graph) {
@@ -29,7 +29,7 @@ std::vector<int> ArcGraph::GetNextVertices(int vertex) const {
   return result;
 }
 
-std::vector<int> ArcGraph::GetPrevVertices(int vertex) const {
+std::vector<int> ArcGraph::GetParents(int vertex) const {
   std::vector<int> result;
 
   for (auto &edge : _graph) {

@@ -9,7 +9,7 @@ MatrixGraph::MatrixGraph(const IGraph &imageGraph)
     : _graph(imageGraph.VerticesCount(),
              std::vector<int>(imageGraph.VerticesCount(), 0)) {
   for (int i = 0; i != imageGraph.VerticesCount(); ++i) {
-    std::vector<int> verticals = imageGraph.GetNextVertices(i);
+    std::vector<int> verticals = imageGraph.GetChildren(i);
     for (int elem : verticals) {
       _graph[i][elem] = 1;
     }
@@ -20,7 +20,7 @@ void MatrixGraph::AddEdge(int from, int to) { _graph[from][to] = 1; }
 
 size_t MatrixGraph::VerticesCount() const { return _graph.size(); }
 
-std::vector<int> MatrixGraph::GetNextVertices(int vertex) const {
+std::vector<int> MatrixGraph::GetChildren(int vertex) const {
   std::vector<int> result;
 
   for (int i = 0; i != _graph[vertex].size(); ++i) {
@@ -29,7 +29,7 @@ std::vector<int> MatrixGraph::GetNextVertices(int vertex) const {
   return result;
 }
 
-std::vector<int> MatrixGraph::GetPrevVertices(int vertex) const {
+std::vector<int> MatrixGraph::GetParents(int vertex) const {
   std::vector<int> result;
 
   for (int i = 0; i != _graph.size(); ++i) {
