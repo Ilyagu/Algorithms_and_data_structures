@@ -43,7 +43,7 @@ class ListGraph : public IGraph {
 ListGraph::ListGraph(size_t verticesCount) : _graph(verticesCount) {}
 
 ListGraph::ListGraph(const IGraph& graph) {
-  for (int i = 0; i != graph.VerticesCount(); ++i) {
+  for (int i = 0; i != graph.VerticesCount(); i++) {
     _graph[i] = graph.GetChildren(i);
   }
 }
@@ -65,7 +65,7 @@ std::vector<int> ListGraph::GetChildren(int vertex) const {
 
 std::vector<int> ListGraph::GetParents(int vertex) const {
   std::vector<int> result;
-  for (int i = 0; i < _graph.size(); ++i) {
+  for (int i = 0; i < _graph.size(); i++) {
     for (auto child : _graph[i]) {
       if (child == vertex) {
         result.push_back(i);
@@ -112,7 +112,7 @@ int main() {
   std::cin >> edges;
 
   int from = 0, to = 0;
-  for (size_t i = 0; i != edges; ++i) {
+  for (size_t i = 0; i != edges; i++) {
     std::cin >> from >> to;
     listGraph.AddEdge(from, to);
   }

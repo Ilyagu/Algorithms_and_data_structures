@@ -29,13 +29,13 @@ class WeightListGraph : public IWeightGraph {
 
   [[nodiscard]] int VerticesCount() const override;
   [[nodiscard]] std::vector<std::pair<int, int>>
-    GetChildren(int vertex) const override;  // vertex, weight
+    GetChildren(int vertex) const override; // вершина, вес
   [[nodiscard]] std::vector<std::pair<int, int>>
-    GetParents(int vertex) const override;  // vertex, weight
+    GetParents(int vertex) const override; // вершина, вес
 
  private:
   std::vector<std::vector<std::pair<int, int>>>
-      adjacencyLists;  // vertex, weight
+      adjacencyLists; // вершина, вес
 };
 
 WeightListGraph::WeightListGraph(int vertexCount)
@@ -43,7 +43,7 @@ WeightListGraph::WeightListGraph(int vertexCount)
 
 WeightListGraph::WeightListGraph(const IWeightGraph& graph) {
   adjacencyLists.resize(graph.VerticesCount());
-  for (int from = 0; from < adjacencyLists.size(); ++from)
+  for (int from = 0; from < adjacencyLists.size(); from++)
     adjacencyLists[from] = graph.GetChildren(from);
 }
 
@@ -70,8 +70,8 @@ std::vector<std::pair<int, int>> WeightListGraph::GetChildren(
 std::vector<std::pair<int, int>> WeightListGraph::GetParents(int vertex) const {
   assert(vertex >= 0 && vertex < adjacencyLists.size());
   std::vector<std::pair<int, int>> result;
-  for (int from = 0; from < adjacencyLists.size(); ++from)
-    for (int i = 0; i < adjacencyLists[from].size(); ++i)
+  for (int from = 0; from < adjacencyLists.size(); from++)
+    for (int i = 0; i < adjacencyLists[from].size(); i++)
       if (adjacencyLists[from][i].first == vertex)
         result.emplace_back(from, adjacencyLists[from][i].second);
   return result;
