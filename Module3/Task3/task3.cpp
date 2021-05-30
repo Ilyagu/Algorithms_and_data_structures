@@ -6,6 +6,8 @@
 #include <set>
 #include <vector>
 
+#define EMPTY -1
+
 struct IWeightGraph {
   virtual ~IWeightGraph() = default;
 
@@ -29,13 +31,13 @@ class WeightListGraph : public IWeightGraph {
 
   [[nodiscard]] int VerticesCount() const override;
   [[nodiscard]] std::vector<std::pair<int, int>>
-    GetChildren(int vertex) const override; // вершина, вес
+    GetChildren(int vertex) const override;  // вершина, вес
   [[nodiscard]] std::vector<std::pair<int, int>>
-    GetParents(int vertex) const override; // вершина, вес
+    GetParents(int vertex) const override;  // вершина, вес
 
  private:
   std::vector<std::vector<std::pair<int, int>>>
-      adjacencyLists; // вершина, вес
+      adjacencyLists;  // вершина, вес
 };
 
 WeightListGraph::WeightListGraph(int vertexCount)
@@ -85,11 +87,11 @@ int Relax(std::vector<int>& wayMinWeights, int EdgeWeight, int from,
     parents[to] = from;
     return oldWeight;
   }
-  return -1;
+  return EMPTY;
 }
 
 int minWay(const IWeightGraph& graph, int from, int to) {
-  std::vector<int> parents(graph.VerticesCount(), -1);
+  std::vector<int> parents(graph.VerticesCount(), EMPTY);
   std::vector<int> wayMinWeights(graph.VerticesCount(),
                                   std::numeric_limits<int>::max());
 
@@ -125,13 +127,12 @@ int minWay(const IWeightGraph& graph, int from, int to) {
       } else {
         int oldWeight = Relax(wayMinWeights, children[i].second,
                               currentVertex.first, children[i].first, parents);
-        if (oldWeight != -1) {
+        if (oldWeight != EMPTY) {
           // заменяем элемент в очереди уже с актуальным весом пути
           auto element = priorityQueue.find(
               std::make_pair(children[i].first, oldWeight));
           if (element != priorityQueue.end()) priorityQueue.erase(element);
-          priorityQueue.insert(
-              std::make_pair(children[i].first, wayMinWeights[i]));
+          priorityQueue.insert(std::make_pair(children[i].first, wayMinWeights[i]));
         }
       }
     }
