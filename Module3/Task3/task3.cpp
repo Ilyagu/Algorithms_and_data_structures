@@ -108,23 +108,23 @@ int minWay(const IWeightGraph& graph, int from, int to) {
   priorityQueue.insert(std::make_pair(from, wayMinWeights[from]));
 
   while (!priorityQueue.empty()) {
-    auto cur = priorityQueue.begin();
-    std::pair<int, int> current = *cur;
-    priorityQueue.erase(cur);
-    auto children = graph.GetChildren(current.first);
+    auto current = priorityQueue.begin();
+    std::pair<int, int> currentVertex = *current;
+    priorityQueue.erase(current);
+    auto children = graph.GetChildren(currentVertex.first);
     for (int i = 0; i < children.size(); i++) {
       // встречаем вершину первый раз - задаем текущий путь
       if (wayMinWeights[children[i].first] ==
           std::numeric_limits<int>::max()) {
         wayMinWeights[children[i].first] =
-            wayMinWeights[current.first] + children[i].second;
-        parents[children[i].first] = current.first;
+            wayMinWeights[currentVertex.first] + children[i].second;
+        parents[children[i].first] = currentVertex.first;
         priorityQueue.insert(std::make_pair(
             children[i].first, wayMinWeights[children[i].first]));
         // уже встречали вершину - пробуем оптимизировать путь с помощью Relax
       } else {
         int oldWeight = Relax(wayMinWeights, children[i].second,
-                              current.first, children[i].first, parents);
+                              currentVertex.first, children[i].first, parents);
         if (oldWeight != -1) {
           // заменяем элемент в очереди уже с актуальным весом пути
           auto element = priorityQueue.find(

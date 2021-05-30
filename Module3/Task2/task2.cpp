@@ -86,16 +86,16 @@ int ListGraph::minWay(int from, int to) const {
   minWaysCounter[from] = 1;
 
   while (!queue.empty()) {
-    int vertex = queue.front();
+    int currentVertex = queue.front();
     queue.pop();
 
-    for (auto child : GetChildren(vertex)) {
-      if (lol[child] > lol[vertex] + 1) {
-        lol[child] = lol[vertex] + 1;
+    for (auto child : GetChildren(currentVertex)) {
+      if (lol[child] > lol[currentVertex] + 1) {
+        lol[child] = lol[currentVertex] + 1;
         queue.push(child);
-        minWaysCounter[child] = minWaysCounter[vertex];
-      } else if (lol[child] == lol[vertex] + 1) {
-        minWaysCounter[child] += minWaysCounter[vertex];
+        minWaysCounter[child] = minWaysCounter[currentVertex];
+      } else if (lol[child] == lol[currentVertex] + 1) {
+        minWaysCounter[child] += minWaysCounter[currentVertex];
       }
     }
   }
