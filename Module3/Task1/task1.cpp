@@ -12,13 +12,14 @@
 #include "setGraph.hpp"
 
 void dfs_aux(const IGraph& graph, int vertex, std::vector<bool>& visited,
-             std::function<void(int)>& callback) {
+             std::function<void(int)>& callback, int& count) {
   visited[vertex] = true;
   callback(vertex);
 
   for (auto child : graph.GetChildren(vertex)) {
     if (!visited[child]) {
-      dfs_aux(graph, child, visited, callback);
+      count++;
+      dfs_aux(graph, child, visited, callback, count);
     }
   }
 }
@@ -27,9 +28,12 @@ void dfs(const IGraph& graph, std::function<void(int)> print) {
   std::vector<bool> visited;
   visited.resize(graph.VerticesCount(), false);
 
+  int count = 0;
+
   for (int i = 0; i < graph.VerticesCount(); ++i) {
     if (!visited[i]) {
-      dfs_aux(graph, i, visited, print);
+      count++;
+      dfs_aux(graph, i, visited, print, count);
     }
   }
 }
